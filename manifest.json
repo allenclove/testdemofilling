@@ -1,0 +1,13 @@
+{
+    "manifest_version": 3,
+    "name": "谷歌翻译助手",
+    "version": "1.0",
+    "description": "快速打开谷歌翻译并填入文本",
+    "permissions": [
+        "tabs",
+        "scripting"
+    ],
+    "action": {
+        "default_popup": "popup.html"
+    }
+}

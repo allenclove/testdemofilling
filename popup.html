@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>谷歌翻译助手</title>
+    <style>
+        body {
+            width: 300px;
+            font-family: Arial, sans-serif;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        h3 {
+            margin: 0 0 10px;
+            text-align: center;
+        }
+        #inputText {
+            width: calc(100% - 16px); /* 考虑内边距 */
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        #checkboxes {
+            margin-bottom: 10px;
+        }
+        label {
+            display: inline-flex; /* 在同一行展示 */
+            align-items: center;
+            margin: 5px 0; /* 适当的上下间距 */
+        }
+        input[type="checkbox"] {
+            margin-right: 8px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50; /* 绿色背景 */
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #45a049; /* 悬停效果 */
+        }
+    </style>
+</head>
+<body>
+    <h3>选择翻译语言</h3>
+    <input type="text" id="inputText" placeholder="输入要翻译的文本" />
+    <div id="checkboxes"></div>
+    <button id="openUrls">开启翻译</button>
+
+    <script src="popup.js"></script>
+</body>
+</html>
