@@ -5,7 +5,8 @@
     "description": "快速打开谷歌翻译并填入文本",
     "permissions": [
         "tabs",
-        "scripting"
+        "scripting",
+        "storage"
     ],
     "action": {
         "default_popup": "popup.html"

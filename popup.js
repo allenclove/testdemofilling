@@ -1,42 +1,85 @@
-// 假设配置保存在一个名为 config.json 的文件中
-fetch('config.json')
-    .then(response => response.json())
-    .then(data => {
-        const checkboxesDiv = document.getElementById('checkboxes');
+// 加载复选框配置并初始化界面
+function loadCheckboxes() {
+    fetch('config.json')
+        .then(response => response.json())
+        .then(data => {
+            const checkboxesDiv = document.getElementById('checkboxes');
+            checkboxesDiv.innerHTML = ''; // 清空之前内容
 
-        // 动态创建复选框
-        for (const [key, value] of Object.entries(data)) {
-            const checkbox = document.createElement('input');
-            checkbox.type = 'checkbox';
-            checkbox.id = key;
-            checkbox.value = value; // 复选框的值为语言代码
-            const label = document.createElement('label');
-            label.htmlFor = key;
-            label.innerText = key;
+            for (const [key, value] of Object.entries(data)) {
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.id = key;
+                checkbox.value = value;
 
-            checkboxesDiv.appendChild(checkbox);
-            checkboxesDiv.appendChild(label);
-            checkboxesDiv.appendChild(document.createElement('br'));
+                const label = document.createElement('label');
+                label.htmlFor = key;
+                label.innerText = key;
+
+                checkboxesDiv.appendChild(checkbox);
+                checkboxesDiv.appendChild(label);
+                checkboxesDiv.appendChild(document.createElement('br'));
+            }
+
+            loadPreviousSettings(); // 加载上一次的设置
+        });
+}
+
+// 加载之前存储的设置
+function loadPreviousSettings() {
+    chrome.storage.local.get(['inputText', 'selectedCheckboxes'], data => {
+        if (data.inputText) document.getElementById('inputText').value = data.inputText;
+        if (data.selectedCheckboxes) {
+            data.selectedCheckboxes.forEach(id => {
+                const checkbox = document.getElementById(id);
+                if (checkbox) checkbox.checked = true;
+            });
         }
     });
+}
+
+// 保存当前设置到本地存储
+function saveSettings(inputText, selectedCheckboxes) {
+    chrome.storage.local.set({ inputText, selectedCheckboxes });
+}
+
+// 全选或取消全选复选框
+document.getElementById('selectAll').addEventListener('change', function() {
+    const checkboxes = document.querySelectorAll('#checkboxes input[type="checkbox"]');
+    checkboxes.forEach(checkbox => checkbox.checked = this.checked);
+});
 
 // 处理“开启”按钮点击事件
 document.getElementById('openUrls').addEventListener('click', () => {
-    const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
-    const urlsToOpen = [];
-    const inputText = document.getElementById('inputText').value; // 获取文本框内容
+    const inputText = document.getElementById('inputText').value;
+    const errorElement = document.getElementById('error');
 
-    // 基本的谷歌翻译URL
+    // 检查文本框是否为空
+    if (!inputText) {
+        errorElement.style.display = 'block';
+        return;
+    } else {
+        errorElement.style.display = 'none';
+    }
+
+    const checkboxes = document.querySelectorAll('#checkboxes input[type="checkbox"]:checked');
+    const selectedCheckboxes = Array.from(checkboxes).map(cb => cb.id);
+    const urlsToOpen = [];
     const baseUrl = "https://translate.google.com/?sl=auto&tl=";
 
     checkboxes.forEach(checkbox => {
-        const languageCode = checkbox.value; // 语言代码
-        const fullUrl = baseUrl + languageCode + "&text=" + encodeURIComponent(inputText); // 拼接完整URL
+        const fullUrl = baseUrl + checkbox.value + "&text=" + encodeURIComponent(inputText);
         urlsToOpen.push(fullUrl);
     });
 
-    // 打开选中的URL
+    // 保存设置
+    saveSettings(inputText, selectedCheckboxes);
+
+    // 打开所有选择的URL
     urlsToOpen.forEach(url => {
         chrome.tabs.create({ url: url });
     });
 });
+
+// 初始化界面
+document.addEventListener('DOMContentLoaded', loadCheckboxes);
